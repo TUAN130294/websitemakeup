@@ -1,17 +1,79 @@
 import React, { useState } from 'react';
 
+interface BookingFormData {
+  name: string;
+  phone: string;
+  location: string;
+  date: string;
+  time: string;
+  skinCondition: string;
+  notes: string;
+}
+
 const Booking: React.FC = () => {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState<BookingFormData>({
+    name: '',
+    phone: '',
+    location: '',
+    date: '',
+    time: '',
+    skinCondition: '',
+    notes: ''
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [id]: value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setShowSuccess(true);
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('/api/booking', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setShowSuccess(true);
+        // Reset form
+        setFormData({
+          name: '',
+          phone: '',
+          location: '',
+          date: '',
+          time: '',
+          skinCondition: '',
+          notes: ''
+        });
+        setDetailsOpen(false);
+      } else {
+        // Handle error
+        alert(`Lỗi: ${result.error || 'Không thể gửi yêu cầu đặt lịch. Vui lòng thử lại sau.'}`);
+      }
+    } catch (error) {
+      console.error('Booking submission error:', error);
+      alert('Lỗi kết nối. Vui lòng kiểm tra internet và thử lại sau.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCloseSuccess = () => {
     setShowSuccess(false);
-    // Optionally reset form here
   };
 
   return (
@@ -39,6 +101,8 @@ const Booking: React.FC = () => {
                 placeholder="Nhập họ tên của bạn"
                 required
                 type="text"
+                value={formData.name}
+                onChange={handleInputChange}
               />
               <span className="absolute right-3 top-3 text-gray-400 dark:text-[#6b5e50]">
                 <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
@@ -60,6 +124,8 @@ const Booking: React.FC = () => {
                 placeholder="09xx xxx xxx"
                 required
                 type="tel"
+                value={formData.phone}
+                onChange={handleInputChange}
               />
               <span className="absolute right-3 top-3 text-gray-400 dark:text-[#6b5e50]">
                 <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
@@ -81,6 +147,8 @@ const Booking: React.FC = () => {
                 placeholder="Ví dụ: Khách sạn Dalat Palace"
                 required
                 type="text"
+                value={formData.location}
+                onChange={handleInputChange}
               />
               <span className="absolute right-3 top-3 text-gray-400 dark:text-[#6b5e50]">
                 <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
@@ -101,6 +169,8 @@ const Booking: React.FC = () => {
                 id="date"
                 required
                 type="date"
+                value={formData.date}
+                onChange={handleInputChange}
               />
             </div>
             <div className="space-y-2 flex-1">
@@ -112,6 +182,8 @@ const Booking: React.FC = () => {
                 id="time"
                 required
                 type="time"
+                value={formData.time}
+                onChange={handleInputChange}
               />
             </div>
           </div>
@@ -146,8 +218,10 @@ const Booking: React.FC = () => {
                 <select
                   className="block w-full h-[48px] rounded border-gray-200 dark:border-[#4a4238] bg-white dark:bg-[#342e27] text-[#191510] dark:text-white px-4 py-3 text-base focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
                   id="skin"
+                  value={formData.skinCondition}
+                  onChange={handleInputChange}
                 >
-                  <option disabled selected value="">
+                  <option disabled value="">
                     Chọn tình trạng da của bạn
                   </option>
                   <option value="normal">Da thường</option>
@@ -167,17 +241,29 @@ const Booking: React.FC = () => {
                   id="notes"
                   placeholder="Bất kỳ yêu cầu đặc biệt nào khác..."
                   rows={3}
+                  value={formData.notes}
+                  onChange={handleInputChange}
                 ></textarea>
               </div>
             </div>
           </div>
 
           <button
-            className="w-full h-[56px] mt-4 bg-primary hover:bg-primary-hover text-white rounded-full font-medium text-lg shadow-lg shadow-primary/30 transition-all duration-300 transform active:scale-[0.98] flex items-center justify-center gap-2"
+            className="w-full h-[56px] mt-4 bg-primary hover:bg-primary-hover text-white rounded-full font-medium text-lg shadow-lg shadow-primary/30 transition-all duration-300 transform active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             type="submit"
+            disabled={isLoading}
           >
-            <span>Gửi yêu cầu đặt lịch</span>
-            <span className="material-symbols-outlined text-sm">arrow_forward</span>
+            {isLoading ? (
+              <>
+                <span className="material-symbols-outlined animate-spin">refresh</span>
+                <span>Đang gửi...</span>
+              </>
+            ) : (
+              <>
+                <span>Gửi yêu cầu đặt lịch</span>
+                <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              </>
+            )}
           </button>
         </form>
       </div>
