@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 interface BookingFormData {
   name: string;
   phone: string;
+  email: string;
   location: string;
   date: string;
   time: string;
@@ -17,6 +18,7 @@ const Booking: React.FC = () => {
   const [formData, setFormData] = useState<BookingFormData>({
     name: '',
     phone: '',
+    email: '',
     location: '',
     date: '',
     time: '',
@@ -53,6 +55,7 @@ const Booking: React.FC = () => {
         setFormData({
           name: '',
           phone: '',
+          email: '',
           location: '',
           date: '',
           time: '',
@@ -130,6 +133,28 @@ const Booking: React.FC = () => {
               <span className="absolute right-3 top-3 text-gray-400 dark:text-[#6b5e50]">
                 <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
                   call
+                </span>
+              </span>
+            </div>
+          </div>
+
+          {/* Email Field (Optional) */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-[#191510] dark:text-[#e3dcd4]" htmlFor="email">
+              Email <span className="text-gray-400 text-xs">(tùy chọn - để nhận email xác nhận)</span>
+            </label>
+            <div className="relative">
+              <input
+                className="block w-full h-[48px] rounded border-gray-200 dark:border-[#4a4238] bg-white dark:bg-[#342e27] text-[#191510] dark:text-white px-4 py-3 text-base focus:border-primary focus:ring-1 focus:ring-primary placeholder:text-gray-400 dark:placeholder:text-[#6b5e50] transition-colors"
+                id="email"
+                placeholder="example@email.com"
+                type="email"
+                value={formData.email}
+                onChange={handleInputChange}
+              />
+              <span className="absolute right-3 top-3 text-gray-400 dark:text-[#6b5e50]">
+                <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
+                  mail
                 </span>
               </span>
             </div>

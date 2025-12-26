@@ -6,6 +6,7 @@ interface BookingRequest {
   time: string;
   skinCondition?: string;
   notes?: string;
+  email?: string;
 }
 
 interface EmailResponse {
@@ -98,8 +99,8 @@ export async function onRequestPost(context: { request: Request; env: { RESEND_A
       <p>Trân trọng,<br>Hệ thống đặt lịch Eli Makeup Artist</p>
     `;
 
-    // Send email via Resend API
-    const resendResponse = await fetch('https://api.resend.com/emails', {
+    // Send email to admin
+    const adminEmailResponse = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${env.RESEND_API_KEY}`,
@@ -113,13 +114,13 @@ export async function onRequestPost(context: { request: Request; env: { RESEND_A
       }),
     });
 
-    if (!resendResponse.ok) {
-      const errorData = await resendResponse.text();
+    if (!adminEmailResponse.ok) {
+      const errorData = await adminEmailResponse.text();
       console.error('Resend API error:', errorData);
       return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: 'Failed to send email notification' 
+        JSON.stringify({
+          success: false,
+          error: 'Failed to send email notification'
         }),
         {
           status: 500,
@@ -130,7 +131,72 @@ export async function onRequestPost(context: { request: Request; env: { RESEND_A
       );
     }
 
-    const emailResult: EmailResponse = await resendResponse.json() as EmailResponse;
+    const emailResult: EmailResponse = await adminEmailResponse.json() as EmailResponse;
+
+    // Send confirmation email to customer (if email provided)
+    if (body.email) {
+      const customerEmailContent = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #d4a573;">✨ Xác nhận đặt lịch - Eli Hoàng Tú Makeup Artist</h2>
+          <p>Xin chào <strong>${body.name}</strong>,</p>
+          <p>Cảm ơn bạn đã đặt lịch với Eli! Chúng tôi đã nhận được yêu cầu đặt lịch của bạn với thông tin sau:</p>
+
+          <table style="border-collapse: collapse; width: 100%; margin: 20px 0; background-color: #f9f9f9;">
+            <tr>
+              <td style="padding: 12px; border: 1px solid #e0e0e0; font-weight: bold; background-color: #faf5f0;">📅 Ngày:</td>
+              <td style="padding: 12px; border: 1px solid #e0e0e0;">${body.date}</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px; border: 1px solid #e0e0e0; font-weight: bold; background-color: #faf5f0;">🕐 Giờ:</td>
+              <td style="padding: 12px; border: 1px solid #e0e0e0;">${body.time}</td>
+            </tr>
+            <tr>
+              <td style="padding: 12px; border: 1px solid #e0e0e0; font-weight: bold; background-color: #faf5f0;">📍 Địa điểm:</td>
+              <td style="padding: 12px; border: 1px solid #e0e0e0;">${body.location}</td>
+            </tr>
+          </table>
+
+          <div style="background-color: #fff8f0; padding: 15px; border-left: 4px solid #d4a573; margin: 20px 0;">
+            <p style="margin: 0;"><strong>📞 Eli sẽ liên hệ lại với bạn trong vòng 24 giờ</strong> để xác nhận chi tiết và tư vấn thêm về dịch vụ.</p>
+          </div>
+
+          <p>Trong thời gian chờ đợi, bạn có thể:</p>
+          <ul>
+            <li>Chuẩn bị ảnh tham khảo kiểu makeup/tóc yêu thích</li>
+            <li>Dưỡng da kỹ và nghỉ ngơi đầy đủ</li>
+            <li>Liên hệ ngay nếu có thắc mắc qua số hotline hoặc Zalo</li>
+          </ul>
+
+          <p>Nếu bạn cần thay đổi hoặc hủy lịch, vui lòng thông báo trước ít nhất 7 ngày.</p>
+
+          <div style="text-align: center; margin-top: 30px; padding: 20px; background-color: #f9f9f9; border-radius: 8px;">
+            <p style="margin: 0; color: #666;">Liên hệ với chúng tôi:</p>
+            <p style="margin: 5px 0;"><strong>📱 Hotline:</strong> 0123-456-789</p>
+            <p style="margin: 5px 0;"><strong>💬 Zalo:</strong> 0123-456-789</p>
+            <p style="margin: 5px 0;"><strong>📍 Địa chỉ:</strong> Đà Lạt - Ninh Thuận</p>
+          </div>
+
+          <p style="margin-top: 30px; color: #888; font-size: 12px; text-align: center;">
+            Email này được gửi tự động từ hệ thống đặt lịch Eli Hoàng Tú Makeup Artist<br>
+            Vui lòng không trả lời trực tiếp email này.
+          </p>
+        </div>
+      `;
+
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from: 'booking@eli-hoang-tu-makeup.onrender.com',
+          to: [body.email],
+          subject: '✨ Xác nhận đặt lịch - Eli Hoàng Tú Makeup Artist',
+          html: customerEmailContent,
+        }),
+      });
+    }
 
     return new Response(
       JSON.stringify({ 

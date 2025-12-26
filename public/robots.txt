@@ -1,0 +1,14 @@
+# robots.txt for Eli Hoàng Tú Makeup Artist Website
+
+User-agent: *
+Allow: /
+
+# Disallow admin areas (if added in future)
+Disallow: /admin/
+Disallow: /api/
+
+# Sitemap location
+Sitemap: https://eli-hoang-tu-makeup.pages.dev/sitemap.xml
+
+# Crawl delay (polite to servers)
+Crawl-delay: 1

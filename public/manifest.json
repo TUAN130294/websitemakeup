@@ -1,0 +1,48 @@
+{
+  "name": "Eli Hoàng Tú - Makeup Artist",
+  "short_name": "Eli Makeup",
+  "description": "Chuyên gia trang điểm cô dâu và makeup chuyên nghiệp tại Đà Lạt & Ninh Thuận",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8f7f6",
+  "theme_color": "#d4a573",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>💄</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>💄</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["beauty", "lifestyle", "business"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Đặt lịch ngay",
+      "short_name": "Đặt lịch",
+      "description": "Đặt lịch makeup ngay lập tức",
+      "url": "/#booking",
+      "icons": [{
+        "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><text y='20' font-size='20'>📅</text></svg>",
+        "sizes": "96x96"
+      }]
+    },
+    {
+      "name": "Xem Portfolio",
+      "short_name": "Portfolio",
+      "description": "Xem bộ sưu tập tác phẩm",
+      "url": "/#portfolio",
+      "icons": [{
+        "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><text y='20' font-size='20'>🖼️</text></svg>",
+        "sizes": "96x96"
+      }]
+    }
+  ]
+}
